@@ -2,6 +2,7 @@ package com.UPIAutoPay.controller;
 
 
 import com.UPIAutoPay.model.CommonResponse;
+import com.UPIAutoPay.model.LoginRequest;
 import com.UPIAutoPay.model.OtpValidationRequest;
 import com.UPIAutoPay.service.CustomerService;
 import jakarta.persistence.Access;
@@ -17,15 +18,15 @@ import java.util.Map;
 //@Controller
 @RestController
 @RequestMapping("/autoPay")
-@CrossOrigin
+@CrossOrigin("*")
 public class OtpController {
 
     @Autowired
     private CustomerService service;
 
-    @GetMapping("/generate-otp")
-    public ResponseEntity<?> resetUserPassword(@RequestParam(name = "applicationNo") String applicationNo) throws IOException {
-        return ResponseEntity.ok(service.resetPassword(applicationNo).getBody());
+    @PostMapping("/generate-otp")
+    public ResponseEntity<?> resetUserPassword(@RequestBody LoginRequest loginRequest) throws IOException {
+        return ResponseEntity.ok(service.resetPassword(loginRequest.getApplicationNo())).getBody();
     }
 
     @PostMapping("/validate-otp")

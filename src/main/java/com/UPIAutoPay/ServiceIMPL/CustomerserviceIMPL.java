@@ -48,10 +48,10 @@ public class CustomerserviceIMPL implements CustomerService {
                     resetPasswordResponse.setOtpCode(String.valueOf(otpCode));
                     resetPasswordResponse.setMobileNo(otpManage.getMobileNo());
 
-                    if (otpUtility.sendOtp(userDetailData.getMobileNo(), otpCode)){
-                        commonResponse.setCode("0000");
-                        commonResponse.setMsg("otp send success");
-                    }
+//                    if (otpUtility.sendOtp(userDetailData.getMobileNo(), otpCode)){
+//                        commonResponse.setCode("0000");
+//                        commonResponse.setMsg("otp send success");
+//                    }
                     resetPasswordResponse.setCommonResponse(commonResponse);
                     return ResponseEntity.ok(resetPasswordResponse);
                 } else {

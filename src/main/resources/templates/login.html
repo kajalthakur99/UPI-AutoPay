@@ -68,11 +68,16 @@
             <label for="otp-code">OTP Code:</label>
             <input type="text" id="otp-code" name="otp-code" class="form-control">
         </div>
+        <div class="form-group">
+            <input type="text" id="otpInput" class="form-control" placeholder="Enter OTP" oninput="validateOtp()"style="display: none;">
+        </div>
 
         <div class="form-group">
-            <button type="button" class="btn btn-primary" onclick="sendOtp()">Send OTP</button>
-            <button type="button" class="btn btn-secondary" id="resend" style="display: none;">Re-Send OTP</button>
+            <button type="button" class="btn btn-primary" id="sendOtpBtn" onclick="sendOtp()">Send OTP</button>
+            <button type="button" class="btn btn" id="resendOtpBtn" style="display: none;" onclick="resendOtp()">Re-Send OTP</button>
+            <button type="button" class="btn btn-success" id="submitOtpBtn" style="display: none;" onclick="submitOtp()">Submit OTP</button>
         </div>
+
     </form>
 </div>
 
@@ -81,7 +86,41 @@
 </footer>
 
 <script>
+    let userMobileNo = ''; // Global variable to store the mobile number
+
     function sendOtp() {
+        const applicationNo = document.getElementById('application-no').value;
+        const confirmApplicationNo = document.getElementById('application-confirmation').value;
+
+        if (applicationNo !== confirmApplicationNo) {
+            alert("Application number did not match.");
+            return;
+        }
+        document.getElementById("sendOtpBtn").style.display = "none";
+        document.getElementById("resendOtpBtn").style.display = "inline-block";
+         document.getElementById("submitOtpBtn").style.display = "inline-block";
+
+        $.ajax({
+            url: 'http://localhost:8090/autoPay/generate-otp', // API endpoint
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ applicationNo: applicationNo }),
+            success: function(response) {
+                console.log(response.msg);
+                userMobileNo = response.mobileNo;
+                document.getElementById('resend').style.display = 'block';
+                document.getElementById('field-confirmation').style.display = 'none';
+                document.getElementById('field-otp-code').style.display = 'block';
+                alert(response.commonResponse.msg);
+            },
+            error: function(xhr, status, error) {
+                $('#response').text(`Error: ${xhr.responseText || error}`);
+            }
+        });
+         document.getElementById("otpInput").style.display = "inline-block";
+    }
+
+        function resendOtp() {
         const applicationNo = document.getElementById('application-no').value;
         const confirmApplicationNo = document.getElementById('application-confirmation').value;
 
@@ -94,19 +133,44 @@
             url: 'http://localhost:8090/autoPay/generate-otp', // API endpoint
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ loanNo: applicationNo }),
+            data: JSON.stringify({ applicationNo: applicationNo }),
             success: function(response) {
                 console.log(response.msg);
+                 userMobileNo = response.mobileNo;
                 document.getElementById('resend').style.display = 'block';
                 document.getElementById('field-confirmation').style.display = 'none';
                 document.getElementById('field-otp-code').style.display = 'block';
-                alert(response.msg);
+                alert(response.commonResponse.msg);
+             const mobileNo = response.commonResponse.mobileNo
             },
             error: function(xhr, status, error) {
                 $('#response').text(`Error: ${xhr.responseText || error}`);
             }
         });
     }
+
+
+    function submitOtp() {
+    const otpInput = document.getElementById("otpInput").value;
+    if (otpInput.length < 6) {
+    alert('OTP must be at least 6 characters long')
+        return;
+    }
+            $.ajax({
+            url: 'http://localhost:8090/autoPay/validate-otp', // API endpoint
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ otpCode: otpInput,mobileNo:userMobileNo }),
+            success: function(response) {
+                console.log(response.msg);
+                alert(response.commonResponse.msg);
+            },
+            error: function(xhr, status, error) {
+                $('#response').text(`Error: ${xhr.responseText || error}`);
+            }
+        });
+
+}
 </script>
 </body>
 </html>
