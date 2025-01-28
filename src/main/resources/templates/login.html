@@ -2,94 +2,111 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width-width, initial-scale=1.0">
-    <title>Login with Application No and OTP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>E-Nach Registration</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        html, body {
             margin: 0;
-            background-color: #f5f5f5;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
-        .login-container {
-            background: #fff;
+        .container {
+            width: 100%;
+            background-color: #044c8c;
+            display: flex;
+            align-items: center;
+        }
+
+        .container img {
+            height: 80px;
+            width: 100%;
+            object-fit: contain;
+        }
+
+        .form {
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            max-width: 800px;
+            width: 90%;
+            margin: 20px auto;
+            flex: 1;
         }
 
-        .login-container h2 {
-            margin-bottom: 20px;
-            color: #333;
-            text-align: center;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .form-group button {
-            width: 100%;
-            padding: 10px;
-            background-color: #007BFF;
+        footer {
+            background-color: #044c8c;
             color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .form-group button:hover {
-            background-color: #0056b3;
-        }
-
-        .error {
-            color: red;
-            font-size: 14px;
-            margin-top: 10px;
+            text-align: center;
+            padding: 10px 0;
         }
     </style>
 </head>
 <body>
+<div class="container">
+    <img src="logo.jpg" alt="Logo">
+</div>
 
-<div class="login-container">
-    <h2>Login</h2>
-    <form id="loginForm">
+<div class="form">
+    <p>E-Nach Registration<br>Create or modify mandate for future payment.</p>
+    <p id="response"></p>
+
+    <form class="form-input" onsubmit="return false;">
         <div class="form-group">
-            <label for="applicationNo">Application Number</label>
-            <input type="text" id="applicationNo" name="applicationNo" placeholder="Enter Application No" required>
+            <label for="application-no">Application Number:</label>
+            <input type="text" id="application-no" name="application-no" class="form-control">
         </div>
+
+        <div class="form-group" id="field-confirmation">
+            <label for="application-confirmation">Confirm Application Number:</label>
+            <input type="text" id="application-confirmation" name="application-confirmation" class="form-control">
+        </div>
+
+        <div class="form-group" id="field-otp-code" style="display: none;">
+            <label for="otp-code">OTP Code:</label>
+            <input type="text" id="otp-code" name="otp-code" class="form-control">
+        </div>
+
         <div class="form-group">
-            <label for="otp">OTP</label>
-            <input type="text" id="otp" name="otp" placeholder="Enter OTP" required>
+            <button type="button" class="btn btn-primary" onclick="sendOtp()">Send OTP</button>
+            <button type="button" class="btn btn-secondary" id="resend" style="display: none;">Re-Send OTP</button>
         </div>
-        <div class="form-group">
-            <button type="button" id="loginButton">Login</button>
-        </div>
-        <div class="error" id="errorMessage" style="display: none;">Invalid Application Number or OTP.</div>
     </form>
 </div>
 
+<footer>
+    <p>Copyright &copy; 2025 Shubham Housing Finance. All Rights Reserved.</p>
+</footer>
 
+<script>
+    function sendOtp() {
+        const applicationNo = document.getElementById('application-no').value;
+        const confirmApplicationNo = document.getElementById('application-confirmation').value;
 
+        if (applicationNo !== confirmApplicationNo) {
+            alert("Application number did not match.");
+            return;
+        }
+
+        $.ajax({
+            url: 'http://localhost:8090/autoPay/generate-otp', // API endpoint
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ loanNo: applicationNo }),
+            success: function(response) {
+                console.log(response.msg);
+                document.getElementById('resend').style.display = 'block';
+                document.getElementById('field-confirmation').style.display = 'none';
+                document.getElementById('field-otp-code').style.display = 'block';
+                alert(response.msg);
+            },
+            error: function(xhr, status, error) {
+                $('#response').text(`Error: ${xhr.responseText || error}`);
+            }
+        });
+    }
+</script>
 </body>
 </html>
