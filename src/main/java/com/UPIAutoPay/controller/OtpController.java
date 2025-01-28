@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-@Controller
+//@Controller
 @RestController
 @RequestMapping("/autoPay")
 @CrossOrigin
@@ -23,7 +23,7 @@ public class OtpController {
     @Autowired
     private CustomerService service;
 
-    @PostMapping("/generate-otp")
+    @GetMapping("/generate-otp")
     public ResponseEntity<?> resetUserPassword(@RequestParam(name = "applicationNo") String applicationNo) throws IOException {
         return ResponseEntity.ok(service.resetPassword(applicationNo).getBody());
     }

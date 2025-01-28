@@ -41,6 +41,7 @@ public class CustomerserviceIMPL implements CustomerService {
                     OtpDetails otpManage = new OtpDetails();
                     otpManage.setOtpCode(String.valueOf(otpCode));
                     otpManage.setOtpExprTime(LocalDateTime.now());
+                    otpManage.setMobileNo(userDetailData.getMobileNo());
                     otpDetailsRepository.save(otpManage);
 
                     resetPasswordResponse.setOtpId(otpManage.getOtpId());
